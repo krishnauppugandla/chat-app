@@ -1,0 +1,13 @@
+node_modules/
+.env
+dist/
+build/
+.DS_Store
+*.log
+.nyc_output
+coverage/
+server/uploads/
+*.sqlite
+.vercel
+.render
+commit_history.sh
