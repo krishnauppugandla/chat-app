@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  name          String
+  email         String    @unique
+  password_hash String
+  avatar_url    String?
+  bio           String?
+  last_seen     DateTime?
+  refresh_token String?
+  created_at    DateTime  @default(now())
+
+  chats        ChatMember[]
+  messages     Message[]
+  reactions    Reaction[]
+  msg_statuses MessageStatus[]
+
+  @@index([email])
+}
+
+model Chat {
+  id         String   @id @default(uuid())
+  name       String?
+  is_group   Boolean  @default(false)
+  avatar_url String?
+  created_by String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  members  ChatMember[]
+  messages Message[]
+
+  @@index([updated_at])
+}
+
+model ChatMember {
+  id        String   @id @default(uuid())
+  chat_id   String
+  user_id   String
+  role      String   @default("member")
+  joined_at DateTime @default(now())
+
+  chat Chat @relation(fields: [chat_id], references: [id], onDelete: Cascade)
+  user User @relation(fields: [user_id], references: [id])
+
+  @@unique([chat_id, user_id])
+  @@index([user_id])
+  @@index([chat_id, user_id])
+}
+
+model Message {
+  id          String    @id @default(uuid())
+  chat_id     String
+  sender_id   String
+  content     String?
+  type        String    @default("text")
+  file_url    String?
+  reply_to_id String?
+  is_edited   Boolean   @default(false)
+  is_deleted  Boolean   @default(false)
+  created_at  DateTime  @default(now())
+  edited_at   DateTime?
+
+  chat      Chat            @relation(fields: [chat_id], references: [id], onDelete: Cascade)
+  sender    User            @relation(fields: [sender_id], references: [id])
+  reply_to  Message?        @relation("replies", fields: [reply_to_id], references: [id])
+  replies   Message[]       @relation("replies")
+  statuses  MessageStatus[]
+  reactions Reaction[]
+
+  @@index([chat_id, created_at(sort: Desc)])
+  @@index([sender_id])
+}
+
+model MessageStatus {
+  id         String   @id @default(uuid())
+  message_id String
+  user_id    String
+  status     String   @default("delivered")
+  updated_at DateTime @updatedAt
+
+  message Message @relation(fields: [message_id], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [user_id], references: [id])
+
+  @@unique([message_id, user_id])
+  @@index([message_id])
+}
+
+model Reaction {
+  id         String   @id @default(uuid())
+  message_id String
+  user_id    String
+  emoji      String
+  created_at DateTime @default(now())
+
+  message Message @relation(fields: [message_id], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [user_id], references: [id])
+
+  @@unique([message_id, user_id, emoji])
+  @@index([message_id])
+}
