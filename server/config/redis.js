@@ -1,8 +1,16 @@
 import Redis from 'ioredis';
 
+// Upstash requires TLS for rediss:// URLs — standard redis:// (local dev) works without it
+const isTLS = process.env.REDIS_URL?.startsWith('rediss://');
+
 const redis = new Redis(process.env.REDIS_URL, {
-  maxRetriesPerRequest: 3,
-  lazyConnect: true,
+  maxRetriesPerRequest: null,
+  enableReadyCheck: false,
+  ...(isTLS && {
+    tls: {
+      rejectUnauthorized: false,
+    },
+  }),
 });
 
 redis.on('error', (err) => {
