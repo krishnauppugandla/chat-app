@@ -18,6 +18,12 @@ export const initSocket = (httpServer) => {
   const pubClient = redis;
   const subClient = redis.duplicate();
 
+  subClient.on('error', (err) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[Redis Sub] Connection error:', err.message);
+    }
+  });
+
   io.adapter(createAdapter(pubClient, subClient));
 
   io.use((socket, next) => {
