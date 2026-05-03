@@ -21,7 +21,7 @@ export const SocketProvider = ({ children }) => {
 
     const socket = io(import.meta.env.VITE_API_URL, {
       auth: { token: accessToken },
-      transports: ['websocket'],
+      transports: ['websocket', 'polling'],
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
       reconnectionAttempts: Infinity,
