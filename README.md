@@ -2,7 +2,7 @@
 
 A production-grade real-time messaging application built with React, Node.js, PostgreSQL, and Redis. Supports direct messages, group chats, typing indicators, read receipts, reactions, and file sharing.
 
-**Live demo:** `https://your-demo-url.com` | Test with `alice@demo.com / password123`
+**Live demo:** `https://chat-app-gray-three-37.vercel.app/` | Test with `alice@demo.com / password123`
 
 ---
 
